@@ -5,6 +5,7 @@ import fs from "fs";
 if (fs.existsSync(".env")) {
   dotenv.config();
 }
+
 import { transform } from "./transform.js";
 import { exportToExcelBuffer } from "./excel.js";
 import { sendResumenEmail } from "./email.js";
