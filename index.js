@@ -5,12 +5,12 @@ import fs from "fs";
 if (fs.existsSync(".env")) {
   dotenv.config();
 }
-
 import { transform } from "./transform.js";
 import { exportToExcelBuffer } from "./excel.js";
 import { sendResumenEmail } from "./email.js";
 import { getBogotaDateString } from "./utils.js";
 import { http } from "@google-cloud/functions-framework";
+import nodemailer from "nodemailer";
 
 // --- Main HTTP Function ---
 http("sendNotifications", async (req, res) => {
