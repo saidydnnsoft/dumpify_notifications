@@ -8,6 +8,11 @@ export async function exportToExcelBuffer(data) {
     { header: "Obra", key: "obra", width: 25 },
     { header: "Frente", key: "frente", width: 25 },
     { header: "Unidad de Control", key: "unidadDeControl", width: 25 },
+    {
+      header: "Estado Unidad de Control",
+      key: "estadoUnidadDeControl",
+      width: 25,
+    },
     { header: "Material", key: "material", width: 30 },
     { header: "Cupo", key: "cupo", width: 12, style: { numFmt: "#,##0.00" } },
     {
@@ -41,6 +46,7 @@ export async function exportToExcelBuffer(data) {
       obra: row.obra,
       frente: row.frente,
       unidadDeControl: row.unidadDeControl,
+      estadoUnidadDeControl: row.estadoUnidadDeControl,
       material: row.material,
       cupo: row.cupo,
       consumidoAnterior: row.consumidoAnterior,

@@ -218,7 +218,7 @@ export function transform(data) {
   }
 
   return {
-    rows: rows.filter((row) => row.estadoUnidadDeControl === "Abierta"),
+    rows,
     usuariosMap,
     obras,
   };
