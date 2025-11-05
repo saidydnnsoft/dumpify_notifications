@@ -41,21 +41,6 @@ export async function exportToExcelBuffer(data) {
     },
   ];
 
-  sheet.addRows(
-    data.map((row) => ({
-      obra: row.obra,
-      frente: row.frente,
-      unidadDeControl: row.unidadDeControl,
-      estadoUnidadDeControl: row.estadoUnidadDeControl,
-      material: row.material,
-      cupo: row.cupo,
-      consumidoAnterior: row.consumidoAnterior,
-      consumidoHoy: row.consumidoHoy,
-      consumidoTotal: row.consumidoTotal,
-      disponible: row.disponible,
-    }))
-  );
-
   sheet.addTable({
     name: "ResumenConsumo",
     ref: "A1",
@@ -72,6 +57,7 @@ export async function exportToExcelBuffer(data) {
       row.obra,
       row.frente,
       row.unidadDeControl,
+      row.estadoUnidadDeControl,
       row.material,
       row.cupo,
       row.consumidoAnterior,
