@@ -39,50 +39,50 @@ http("sendNotifications", async (req, res) => {
       obraBuffers.set(obraId, buffer);
     }
 
-    console.log("Sending emails...");
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: Number(process.env.EMAIL_PORT),
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-    for (const [_, usuario] of usuariosMap) {
-      if (usuario.estado_usuario === "ACTIVO") {
-        const attachments = [];
+    // console.log("Sending emails...");
+    // const transporter = nodemailer.createTransport({
+    //   host: process.env.EMAIL_HOST,
+    //   port: Number(process.env.EMAIL_PORT),
+    //   auth: {
+    //     user: process.env.EMAIL_USER,
+    //     pass: process.env.EMAIL_PASSWORD,
+    //   },
+    // });
+    // for (const [_, usuario] of usuariosMap) {
+    //   if (usuario.estado_usuario === "ACTIVO") {
+    //     const attachments = [];
 
-        for (const obraId of usuario.relatedObras) {
-          const obra = obras[obraId];
-          if (!obra) continue;
-          const buffer = obraBuffers.get(obraId);
-          if (!buffer) continue;
+    //     for (const obraId of usuario.relatedObras) {
+    //       const obra = obras[obraId];
+    //       if (!obra) continue;
+    //       const buffer = obraBuffers.get(obraId);
+    //       if (!buffer) continue;
 
-          attachments.push({
-            filename: `resumen_${obra.nombre.replace(
-              /\s+/g,
-              "_"
-            )}_${today}.xlsx`,
-            content: buffer,
-            contentType:
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          });
-        }
+    //       attachments.push({
+    //         filename: `resumen_${obra.nombre.replace(
+    //           /\s+/g,
+    //           "_"
+    //         )}_${today}.xlsx`,
+    //         content: buffer,
+    //         contentType:
+    //           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    //       });
+    //     }
 
-        if (
-          attachments.length > 0 &&
-          ["Admin", "Super admin", "Auditor"].includes(usuario.rol)
-          // && usuario.correo === "saidnader1987@hotmail.com"
-        ) {
-          await sendResumenEmail(
-            usuario.correo,
-            usuario.usuario,
-            attachments,
-            transporter
-          );
-        }
-      }
-    }
+    //     if (
+    //       attachments.length > 0 &&
+    //       ["Admin", "Super admin", "Auditor"].includes(usuario.rol)
+    //       // && usuario.correo === "saidnader1987@hotmail.com"
+    //     ) {
+    //       await sendResumenEmail(
+    //         usuario.correo,
+    //         usuario.usuario,
+    //         attachments,
+    //         transporter
+    //       );
+    //     }
+    //   }
+    // }
     res.send("✅ Job complete!");
   } catch (error) {
     console.error("❌ Send notifications failed: ", error.message);

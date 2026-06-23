@@ -55,7 +55,7 @@ function transformObras(obras) {
 export function transform(data) {
   const frentes = transformFrentes(data.frente);
   const unidadesDeControl = transformUnidadesDeControl(data.unidad_de_control);
-  const viajes = transformViajes(data.viaje);
+  const viajes = transformViajes([...data.viaje, ...data.viaje_archivo]);
   const materiales = transformMateriales(data.material);
   const cupos = transformCupos(data.cupo);
   const usuariosObras = transformUsuariosObras(data.usuario_obra);
@@ -142,6 +142,45 @@ export function transform(data) {
           }
         }
 
+        const viajesArchivoDesdeUnidadDeControl =
+          unidadDeControl["Related viaje_archivos By id_unidad_de_control_origen"]
+            ?.split(",")
+            .map((id) => id.trim())
+            .filter((id) => id) ?? [];
+
+        for (const viajeId of viajesArchivoDesdeUnidadDeControl) {
+          const viaje = viajes[viajeId];
+          if (viaje["estado"] !== "Anulado") {
+            const fechaRecibo = formatDate(viaje["fecha_recibo"]);
+            const materialId = viaje["id_material"];
+            const tipoViaje = viaje["tipo_viaje"];
+            const volumen = Number(viaje["m3_transportados"]);
+            const tipoMaterial = materiales[materialId]["tipo"];
+
+            const signo =
+              tipoViaje === "Externo" || tipoMaterial === "Corte" ? 1 : -1;
+            const volumenFinal = signo * volumen;
+
+            if (!materialesMap.has(materialId)) {
+              materialesMap.set(materialId, new Map());
+            }
+            const unidadMap = materialesMap.get(materialId);
+
+            const actual = unidadMap.get(unidadDeControlId) ?? {
+              consumidoAnterior: 0,
+              consumidoHoy: 0,
+            };
+
+            if (fechaRecibo === today) {
+              actual.consumidoHoy += volumenFinal;
+            } else if (fechaRecibo < today) {
+              actual.consumidoAnterior += volumenFinal;
+            }
+
+            unidadMap.set(unidadDeControlId, actual);
+          }
+        }
+
         const viajesHaciaUnidadDeControlIds =
           unidadDeControl["Related viajes By id_unidad_de_control_destino"]
             ?.split(",")
@@ -149,6 +188,50 @@ export function transform(data) {
             .filter((id) => id) ?? [];
 
         for (const viajeId of viajesHaciaUnidadDeControlIds) {
+          const viaje = viajes[viajeId];
+          if (viaje["estado_viaje"] !== "Anulado") {
+            const materialId = viaje["id_material"];
+            const fechaRecibo = formatDate(viaje["fecha_recibo"]);
+            const tipoViaje = viaje["tipo_viaje"];
+
+            if (tipoViaje === "Interno") {
+              const volumen = Number(viaje["m3_transportados"]);
+              const tipoMaterial = materiales[materialId]["tipo"];
+
+              const signo = tipoMaterial === "Relleno" ? 1 : -1;
+              const volumenFinal = signo * volumen;
+
+              if (!materialesMap.has(materialId)) {
+                materialesMap.set(materialId, new Map());
+              }
+              const unidadMap = materialesMap.get(materialId);
+
+              const actual = unidadMap.get(unidadDeControlId) ?? {
+                consumidoAnterior: 0,
+                consumidoHoy: 0,
+              };
+
+              const fecha = parseISO(fechaRecibo);
+              const hoy = parseISO(today);
+
+              if (isEqual(fecha, hoy)) {
+                actual.consumidoHoy += volumenFinal;
+              } else if (isBefore(fecha, hoy)) {
+                actual.consumidoAnterior += volumenFinal;
+              }
+
+              unidadMap.set(unidadDeControlId, actual);
+            }
+          }
+        }
+
+        const viajesArchivoHaciaUnidadDeControlIds =
+          unidadDeControl["Related viaje_archivos By id_unidad_de_control_destino"]
+            ?.split(",")
+            .map((id) => id.trim())
+            .filter((id) => id) ?? [];
+
+        for (const viajeId of viajesArchivoHaciaUnidadDeControlIds) {
           const viaje = viajes[viajeId];
           if (viaje["estado_viaje"] !== "Anulado") {
             const materialId = viaje["id_material"];

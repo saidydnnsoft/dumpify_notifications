@@ -38,6 +38,7 @@ export async function extract() {
     "material",
     "cupo",
     "viaje",
+    "viaje_archivo",
   ];
 
   const data = await Promise.all(
