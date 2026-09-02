@@ -38,7 +38,9 @@ export async function extract() {
     "material",
     "cupo",
     "viaje",
-    "viaje_archivo",
+    // Antes se leía "viaje_archivo" (histórico completo). Ahora esa tabla se retiró del app;
+    // el aporte histórico viene pre-agregado (por unidad×material) en "saldo_archivo".
+    "saldo_archivo",
   ];
 
   const data = await Promise.all(
